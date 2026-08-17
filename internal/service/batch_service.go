@@ -289,12 +289,7 @@ func (s *BatchService) CloseBatch(batchID string) error {
 	if err != nil {
 		return err
 	}
-	latest := make(map[string]*domain.RetestRecord)
-	for _, record := range retests {
-		if _, exists := latest[record.ItemID]; !exists {
-			latest[record.ItemID] = record
-		}
-	}
+	latest := latestRetestsByItem(retests)
 	for _, id := range batch.ItemIDs {
 		if latest[id] == nil || !latest[id].Passed {
 			return ErrBatchCloseFailed
