@@ -95,8 +95,8 @@ func (s *BatchService) CreateBatch(material domain.Material) (*domain.TreatmentB
 		if item.Material != material {
 			continue
 		}
-		switch item.Status {
-		case domain.ItemAvailable, domain.ItemInBatch:
+		// 仅收集当前可用的馆藏册；已在未结束批次中的馆藏册不得跨批次串入新批次
+		if item.Status == domain.ItemAvailable {
 			itemIDs = append(itemIDs, item.ID)
 		}
 	}
