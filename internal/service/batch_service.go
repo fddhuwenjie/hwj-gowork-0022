@@ -334,26 +334,21 @@ func (s *BatchService) ListItemsNeedingRetest() ([]*domain.CollectionItem, error
 		if err != nil {
 			return nil, err
 		}
-		batchHasPassingRetest := false
-		for _, record := range retests {
-			if record.Passed {
-				batchHasPassingRetest = true
-				break
-			}
-		}
-		if batchHasPassingRetest {
-			continue
-		}
 		latest := latestRetestsByItem(retests)
 		for _, itemID := range batch.ItemIDs {
-			if (latest[itemID] == nil || !latest[itemID].Passed) && !seen[itemID] {
-				item, err := s.store.GetItem(itemID)
-				if err != nil {
-					return nil, err
-				}
-				result = append(result, item)
-				seen[itemID] = true
+			// 仅排除最新复测已合格的册，仍保留复测失败和未复测的册
+			if latest[itemID] != nil && latest[itemID].Passed {
+				continue
 			}
+			if seen[itemID] {
+				continue
+			}
+			item, err := s.store.GetItem(itemID)
+			if err != nil {
+				return nil, err
+			}
+			result = append(result, item)
+			seen[itemID] = true
 		}
 	}
 	sort.Slice(result, func(i, j int) bool { return result[i].ID < result[j].ID })
