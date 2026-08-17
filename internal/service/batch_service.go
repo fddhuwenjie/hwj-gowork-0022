@@ -334,16 +334,6 @@ func (s *BatchService) ListItemsNeedingRetest() ([]*domain.CollectionItem, error
 		if err != nil {
 			return nil, err
 		}
-		batchHasPassingRetest := false
-		for _, record := range retests {
-			if record.Passed {
-				batchHasPassingRetest = true
-				break
-			}
-		}
-		if batchHasPassingRetest {
-			continue
-		}
 		latest := latestRetestsByItem(retests)
 		for _, itemID := range batch.ItemIDs {
 			if (latest[itemID] == nil || !latest[itemID].Passed) && !seen[itemID] {
