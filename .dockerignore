@@ -1,0 +1,9 @@
+.git
+.DS_Store
+BUG_REPRO.md
+coverage.out
+dist/
+node_modules/
+*.test
+*.log
+tmp/
