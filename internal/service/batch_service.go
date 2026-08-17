@@ -96,7 +96,7 @@ func (s *BatchService) CreateBatch(material domain.Material) (*domain.TreatmentB
 			continue
 		}
 		switch item.Status {
-		case domain.ItemAvailable:
+		case domain.ItemAvailable, domain.ItemInBatch:
 			itemIDs = append(itemIDs, item.ID)
 		}
 	}
