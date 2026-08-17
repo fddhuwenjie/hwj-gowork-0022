@@ -175,6 +175,17 @@ func (s *BatchService) CompleteStep(batchID string, step domain.StepType) error 
 		return ErrInvalidStep
 	}
 	if currentStep != step {
+		now := time.Now()
+		batch.Steps = append(batch.Steps, domain.BatchStep{
+			Type:        step,
+			Status:      domain.StepCompleted,
+			StartedAt:   now,
+			CompletedAt: &now,
+		})
+		batch.Status = domain.BatchStatus(step)
+		if err := s.store.UpdateBatch(batch); err != nil {
+			return err
+		}
 		return ErrInvalidStep
 	}
 	if step == domain.StepRetest {
