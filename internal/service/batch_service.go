@@ -290,10 +290,17 @@ func (s *BatchService) CloseBatch(batchID string) error {
 		return err
 	}
 	latest := latestRetestsByItem(retests)
+
+	// 先校验所有馆藏册最新复测合格，全部通过后才更新任何状态。
+	// 校验与更新混在同一循环会导致部分册（如已合格的前序册）被改为完成状态，
+	// 而后续册校验失败时整批关闭已返回失败，违反“失败不改变任何状态”。
 	for _, id := range batch.ItemIDs {
 		if latest[id] == nil || !latest[id].Passed {
 			return ErrBatchCloseFailed
 		}
+	}
+
+	for _, id := range batch.ItemIDs {
 		item, err := s.store.GetItem(id)
 		if err != nil {
 			return err
