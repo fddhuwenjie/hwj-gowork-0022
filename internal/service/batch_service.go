@@ -294,6 +294,10 @@ func (s *BatchService) CloseBatch(batchID string) error {
 		if latest[id] == nil || !latest[id].Passed {
 			return ErrBatchCloseFailed
 		}
+	}
+
+	// 全部合格，更新馆藏册状态
+	for _, id := range batch.ItemIDs {
 		item, err := s.store.GetItem(id)
 		if err != nil {
 			return err
